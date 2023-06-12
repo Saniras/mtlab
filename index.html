@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>MTL Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css"/>
+    <link rel="stylesheet" href="/feather/feather.css" />
+    <link rel="stylesheet" href="/mdi/css/materialdesignicons.min.css"/>
+    <link rel="stylesheet" href="/ti-icons/css/themify-icons.css"/>
+    <link rel="stylesheet"  src="/typicons/typicons.css" />
+    <link rel="stylesheet"  href="/simple-line-icons/css/simple-line-icons.css"/>
+    <link rel="stylesheet"  href="/css/vendor.bundle.base.css" />
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  	<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="shortcut icon"  href="/images/favicon.png" />
+    <script src='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css' rel='stylesheet' />
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css' rel='stylesheet' />
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css' rel='stylesheet' />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+
+  </head>
+
+  <body>
+    <div class="container-scroller">
+      <!-- partial:../../partials/_navbar.html -->
+      <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
+        <div
+          class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+          <div class="me-3">
+            <button
+              class="navbar-toggler navbar-toggler align-self-center"
+              type="button"
+              data-bs-toggle="minimize">
+              <span class="icon-menu"></span>
+            </button>
+          </div>
+          <div>
+            <a class="navbar-brand brand-logo" href="../../index.html">
+              <img src="https://www.mtlb.co.kr/wp-content/uploads/2019/07/%ED%81%B0%EC%82%AC%EC%9D%B4%EC%A6%88_MTL%EB%A1%9C%EA%B3%A0_%ED%8C%8C%EB%9E%80%EA%B8%80%EC%94%A8.png" width="90px" height="200px" alt="logo" />
+            </a>
+            <a class="navbar-brand brand-logo-mini" href="../../index.html">
+              <img src="https://www.mtlb.co.kr/wp-content/uploads/2019/07/%ED%81%B0%EC%82%AC%EC%9D%B4%EC%A6%88_MTL%EB%A1%9C%EA%B3%A0_%ED%8C%8C%EB%9E%80%EA%B8%80%EC%94%A8.png" alt="logo" />
+            </a>
+          </div>
+        </div>
+        <div class="navbar-menu-wrapper d-flex align-items-top">
+          <ul class="navbar-nav">
+            <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
+              <h3 class="welcome-text">
+                  <img src="./icons/logo/svg/color_logo1.svg" width="150px"alt="logo" /></h3> <h5>Shipment Management System</h5>
+            </li>
+          </ul>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown d-none d-lg-block">
+              <a class="nav-link dropdown-bordered dropdown-toggle dropdown-toggle-split" id="messageDropdown"
+                href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                Select Category
+              </a>
+              <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0" aria-labelledby="messageDropdown">
+                <a class="dropdown-item py-3">
+                  <p class="mb-0 font-weight-medium float-left">
+                    Select category
+                  </p>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-item-content flex-grow py-2">
+                    <p class="preview-subject ellipsis font-weight-medium text-dark">
+                      Bootstrap Bundle
+                    </p>
+                    <p class="fw-light small-text mb-0">
+                      This is a Bundle featuring 16 unique dashboards
+                    </p>
+                  </div>
+                </a>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-item-content flex-grow py-2">
+                    <p class="preview-subject ellipsis font-weight-medium text-dark">
+                      Angular Bundle
+                    </p>
+                    <p class="fw-light small-text mb-0">
+                      Everything you’ll ever need for your Angular projects
+                    </p>
+                  </div>
+                </a>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-item-content flex-grow py-2">
+                    <p class="preview-subject ellipsis font-weight-medium text-dark">
+                      VUE Bundle
+                    </p>
+                    <p class="fw-light small-text mb-0">
+                      Bundle of 6 Premium Vue Admin Dashboard
+                    </p>
+                  </div>
+                </a>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-item-content flex-grow py-2">
+                    <p class="preview-subject ellipsis font-weight-medium text-dark">
+                      React Bundle
+                    </p>
+                    <p class="fw-light small-text mb-0">
+                      Bundle of 8 Premium React Admin Dashboard
+                    </p>
+                  </div>
+                </a>
+              </div>
+            </li>
+            <li class="nav-item d-none d-lg-block">
+              <div id="datepicker-popup" class="input-group date datepicker navbar-date-picker">
+                <span class="input-group-addon input-group-prepend border-right">
+                  <span class="icon-calendar input-group-text calendar-icon"></span>
+                </span>
+                <input type="text" class="form-control" />
+              </div>
+            </li>
+            <li class="nav-item">
+              <form class="search-form" action="#">
+                <i class="icon-search"></i>
+                <input type="search" class="form-control" placeholder="Search Here" title="Search here"/>
+              </form>
+            </li>
+            </ul>
+          </div>
+      </nav>
+      <!-- partial -->
+      <class class="container-fluid page-body-wrapper">
+      <!-- partial:../../partials/_settings-panel.html -->
+          <!-- To do section tab ends -->
+          <!-- chat tab ends -->
+    
+      <!-- partial -->
+      <!-- partial:../../partials/_sidebar.html -->
+<!---------------------------------------------------------------------------------------------------------------------->
+<!----SideBar End----------------------------------------------------------------------------------------------------------------->
+<!---------------------------------------------------------------------------------------------------------------------->
+      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link" href="../../index.html">
+              <i class="mdi mdi-ship-wheel menu-icon"></i>
+              <span class="menu-title">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item nav-category">Rate/Quote</li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+              <i class="menu-icon mdi mdi-train"></i>
+              <span class="menu-title">Rate/Quote</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="ui-basic">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item">
+                  <a class="nav-link" href="../rate/">Rail Rate</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../pages/ui-features/typography.html">Quotes</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item nav-category">Shipment관리</li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
+              <i class="menu-icon mdi mdi-anchor"></i>
+              <span class="menu-title">선적관리</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="form-elements">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item">
+                  <a class="nav-link" href="../../pages/forms/basic_elements.html">본선선적(부산항)</a>
+                </li>
+                   <li class="nav-item">
+                  <a class="nav-link" href="../../pages/forms/basic_elements.html">스케줄 조회</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
+              <i class="menu-icon mdi mdi-map-marker-radius"></i>
+              <span class="menu-title">운송관리</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="charts">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item">
+                  <a class="nav-link" href="../../pages/charts/chartjs.html">화물 추적</a>
+                </li>
+                  <li class="nav-item">
+                  <a class="nav-link" href="../../pages/charts/chartjs.html">예상 ETA</a>
+                </li>
+                  <li class="nav-item">
+                  <a class="nav-link" href="../../pages/ports.html">도착항 Status</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+              <i class="menu-icon mdi mdi-information-variant"></i>
+              <span class="menu-title">정보관리</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="tables">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item">
+                  <a class="nav-link" href="../../pages/congestion/">국가별 항만 혼잡도</a>
+                </li>
+                   <li class="nav-item">
+                  <a class="nav-link" href="../../pages/tracking.html">선박 위치 조회</a>
+                </li>
+                   <li class="nav-item">
+                  <a class="nav-link" href="../../pages/port_status.html">항만 상황 조회</a>
+                </li>
+                   <li class="nav-item">
+                  <a class="nav-link" href="../../pages/weather.html">기상, 재난정보</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+  
+          <li class="nav-item nav-category">마켓 시황</li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+              <i class="menu-icon mdi mdi-finance"></i>
+              <span class="menu-title">관련 지표</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="auth">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item">
+                  <a class="nav-link" href="../../pages/samples/login.html">수출입 물류지표</a>
+                </li>
+                  <li class="nav-item">
+                  <a class="nav-link" href="../../pages/samples/login.html">거시 경제지표</a>
+                </li>
+                  <li class="nav-item">
+                  <a class="nav-link" href="../../pages/samples/login.html">국가별 관세율</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item nav-category">help</li>
+          <li class="nav-item">
+            <a class="nav-link" href="http://bootstrapdash.com/demo/star-admin2-free/docs/documentation.html">
+              <i class="menu-icon mdi mdi-file-document"></i>
+              <span class="menu-title">Documentation</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+<!---------------------------------------------------------------------------------------------------------------------->
+<!----SideBar End----------------------------------------------------------------------------------------------------------------->
+<!---------------------------------------------------------------------------------------------------------------------->
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="row">
+            <div class="col-lg-8 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Port Map</h4>
+                  <div id="map" style="width: 100%; height: 400px;"></div>
+                  </div>
+              </div>
+            </div>
+            <div class="col-lg-4 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+					<h4 class="card-title">Real-Time Data</h4>
+					<p class="card-subtitle"> [Port의 Status를 클릭하면 나옵니다!]</p>
+                    <div class="myChartDiv">
+                  <div id="mypieChart">
+                        <canvas id="myPieChart"></canvas>
+                        </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <div class="row">
+                      <div class="col-lg-8 d-flex flex-column">
+                        <div class="row flex-grow">
+                          <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
+                            <div class="card card-rounded">
+                              <div class="card-body">
+                                <div class="d-sm-flex justify-content-between align-items-start">
+                                  <div>
+                                   <h4 class="card-title card-title-dash">Performance Line Chart</h4>
+                                   <h5 class="card-subtitle card-subtitle-dash">Lorem Ipsum is simply dummy text of the printing</h5>
+                                  </div>
+                                  <div id="performance-line-legend"><div class="weeklyChart"><ul><li><span style="background-color:#1F3BB3"></span>This week</li><li><span style="background-color:#52CDFF"></span>Last week</li></ul></div></div>
+                                </div>
+                                <div class="chartjs-wrapper mt-5"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                                  <canvas id="weeklyChart" style="display: block; height: 300px; width: 800px;" width="705" height="225" class="chartjs-render-monitor"></canvas>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 d-flex flex-column">
+                        <div class="row flex-grow">
+                          <div class="col-md-6 col-lg-12 grid-margin stretch-card">
+                            <div class="card bg-primary card-rounded">
+                              <div class="card-body pb-0">
+                                <h4 class="card-title card-title-dash text-white mb-4">Status Summary</h4>
+                                <div class="row">
+                                  <div class="col-sm-4">
+                                    <p class="status-summary-ight-white mb-1">Closed Value</p>
+                                    <h2 class="text-info">357</h2>
+                                  </div>
+                                  <div class="col-sm-8">
+                                    <div class="status-summary-chart-wrapper pb-4"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                                      <canvas id="status-summary" width="181" height="99" style="display: block; height: 66px; width: 121px;" class="chartjs-render-monitor"></canvas>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-6 col-lg-12 grid-margin stretch-card">
+                            <div class="card card-rounded">
+                              <div class="card-body">
+                                <div class="row">
+                                  <div class="col-sm-6">
+                                    <div class="d-flex justify-content-between align-items-center mb-2 mb-sm-0">
+                                      <div class="circle-progress-width">
+                                        <div id="totalVisitors" class="progressbar-js-circle pr-2"><svg viewBox="0 0 100 100" style="display: block; width: 100%;"><path d="M 50,50 m 0,-42.5 a 42.5,42.5 0 1 1 0,85 a 42.5,42.5 0 1 1 0,-85" stroke="#eee" stroke-width="15" fill-opacity="0"></path><path d="M 50,50 m 0,-42.5 a 42.5,42.5 0 1 1 0,85 a 42.5,42.5 0 1 1 0,-85" stroke="rgb(99,137,233)" stroke-width="15" fill-opacity="0" style="stroke-dasharray: 267.132, 267.132; stroke-dashoffset: 96.1674;"></path></svg><div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 0rem;">64</div></div>
+                                      </div>
+                                      <div>
+                                        <p class="text-small mb-2">Total Visitors</p>
+                                        <h4 class="mb-0 fw-bold">26.80%</h4>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="col-sm-6">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                      <div class="circle-progress-width">
+                                        <div id="visitperday" class="progressbar-js-circle pr-2"><svg viewBox="0 0 100 100" style="display: block; width: 100%;"><path d="M 50,50 m 0,-42.5 a 42.5,42.5 0 1 1 0,85 a 42.5,42.5 0 1 1 0,-85" stroke="#eee" stroke-width="15" fill-opacity="0"></path><path d="M 50,50 m 0,-42.5 a 42.5,42.5 0 1 1 0,85 a 42.5,42.5 0 1 1 0,-85" stroke="rgb(60,168,179)" stroke-width="15" fill-opacity="0" style="stroke-dasharray: 267.132, 267.132; stroke-dashoffset: 176.307;"></path></svg><div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 0rem;">34</div></div>
+                                      </div>
+                                      <div>
+                                        <p class="text-small mb-2">Visits per day</p>
+                                        <h4 class="mb-0 fw-bold">9065</h4>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+       
+            
+          <div class="row">
+            <div class="col-lg-6 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Hoverable Table</h4>
+                  <p class="card-description">
+                    Add class <code>.table-hover</code>
+                  </p>
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>User</th>
+                          <th>Product</th>
+                          <th>Sale</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Jacob</td>
+                          <td>Photoshop</td>
+                          <td class="text-danger"> 28.76% <i class="ti-arrow-down"></i></td>
+                          <td><label class="badge badge-danger">Pending</label></td>
+                        </tr>
+                        <tr>
+                          <td>Messsy</td>
+                          <td>Flash</td>
+                          <td class="text-danger"> 21.06% <i class="ti-arrow-down"></i></td>
+                          <td><label class="badge badge-warning">In progress</label></td>
+                        </tr>
+                        <tr>
+                          <td>John</td>
+                          <td>Premier</td>
+                          <td class="text-danger"> 35.00% <i class="ti-arrow-down"></i></td>
+                          <td><label class="badge badge-info">Fixed</label></td>
+                        </tr>
+                        <tr>
+                          <td>Peter</td>
+                          <td>After effects</td>
+                          <td class="text-success"> 82.00% <i class="ti-arrow-up"></i></td>
+                          <td><label class="badge badge-success">Completed</label></td>
+                        </tr>
+                        <tr>
+                          <td>Dave</td>
+                          <td>53275535</td>
+                          <td class="text-success"> 98.05% <i class="ti-arrow-up"></i></td>
+                          <td><label class="badge badge-warning">In progress</label></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Hoverable Table</h4>
+                  <p class="card-description">
+                    Add class <code>.table-hover</code>
+                  </p>
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>User</th>
+                          <th>Product</th>
+                          <th>Sale</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Jacob</td>
+                          <td>Photoshop</td>
+                          <td class="text-danger"> 28.76% <i class="ti-arrow-down"></i></td>
+                          <td><label class="badge badge-danger">Pending</label></td>
+                        </tr>
+                        <tr>
+                          <td>Messsy</td>
+                          <td>Flash</td>
+                          <td class="text-danger"> 21.06% <i class="ti-arrow-down"></i></td>
+                          <td><label class="badge badge-warning">In progress</label></td>
+                        </tr>
+                        <tr>
+                          <td>John</td>
+                          <td>Premier</td>
+                          <td class="text-danger"> 35.00% <i class="ti-arrow-down"></i></td>
+                          <td><label class="badge badge-info">Fixed</label></td>
+                        </tr>
+                        <tr>
+                          <td>Peter</td>
+                          <td>After effects</td>
+                          <td class="text-success"> 82.00% <i class="ti-arrow-up"></i></td>
+                          <td><label class="badge badge-success">Completed</label></td>
+                        </tr>
+                        <tr>
+                          <td>Dave</td>
+                          <td>53275535</td>
+                          <td class="text-success"> 98.05% <i class="ti-arrow-up"></i></td>
+                          <td><label class="badge badge-warning">In progress</label></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <!-- content-wrapper ends -->
+            <!-- partial:../../partials/_footer.html -->
+            <footer class="footer">
+              <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                <span
+                  class="text-muted text-center text-sm-left d-block d-sm-inline-block">Premium
+                  <a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a>
+                  from BootstrapDash.</span>
+                <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Copyright © 2021. All rights reserved.</span>
+              </div>
+            </footer>
+            <!-- partial -->
+          </div>
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+          </div>
+    
+    <!-- container-scroller -->
+          
+          
+<script> 
+function generatePopupHtml(station) {
+    return `
+      <div id="coverageMapPopup" class="row" style="display: block;">
+        <h1><span class="badge" id="coverageMapStationID">${station.id}</span>
+          <span id="coverageMapStationName">${station.name}</span></h1>
+        <button class="button" id="coverageMapStationButton" onclick="loadStationData(${station.id}); loadShipData(${station.id})">Status</button>
+        <div id="coverageMapPopupClose">x</div>
+      </div>
+    `;
+}
+
+  async function loadStationData(stationId) {
+    try {
+        const realtimeData = await fetch(`/api/stations/${stationId}/realtime`).then(response => response.json());
+        const weeklyStatsData = await fetch(`/api/stations/${stationId}/weekly-statistics`).then(response => response.json());
+        const monthlyStatsData = await fetch(`/api/stations/${stationId}/monthly-statistics`).then(response => response.json());
+        const yearlyStatsData = await fetch(`/api/stations/${stationId}/yearly-statistics`).then(response => response.json());
+      
+        createPieChart(realtimeData.shipType);
+        createLine1Chart(weeklyStatsData); // Assuming you have a function that creates a line chart.
+        createLine2Chart(monthlyStatsData); 
+ 
+    } catch (error) {
+      console.error('Error:', error);
+    }
+}
+
+async function loadShipData(stationId) {
+  try {
+    const data = await fetch(`/api/coords/${stationId}`).then(response => response.json());
+    const shipData = data.shipData;
+
+    if (shipData.positions && shipData.positions.length > 0) {
+      // Iterate over each position
+      shipData.positions.forEach(position => {
+        const lat = position.lat;
+        const lon = position.lon;
+        let iconUrl = "https://www.aishub.net/images/map/@1/number/";
+
+        // Change icon URL based on position parameters
+        if (position.icon === 2 && position.sog > 0) {
+          iconUrl += "2s.png";
+        } else if (position.icon === 1 && position.sog === 0) {
+          iconUrl += "1s.png";
+        } else if (position.icon === 2 && position.sog === 0) {
+          iconUrl += "2s.png";
+        } else if (position.icon === 1 && position.sog > 0) {
+          iconUrl += "1s.png";
+        }
+
+        // Create custom Leaflet icon
+        var customIcon = L.icon({
+          iconUrl: iconUrl,
+          iconSize: [22, 22], // size of the icon
+          iconAnchor: [0, 0], // point of the icon which will correspond to marker's location
+          popupAnchor: [0, -41] // point from which the popup should open relative to the iconAnchor
+        });
+
+        // Add marker to map at the given position
+        var marker = L.marker([lat, lon], { icon: customIcon }).addTo(map);
+      });
+
+      // Fly to the first position with zoom level 12
+      const firstPosition = shipData.positions[0];
+      map.flyTo([firstPosition.lat, firstPosition.lon], 12);
+    }
+    
+    console.log(shipData);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+
+  var map = L.map("map").setView([46, 13.5], 2);
+
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+    maxZoom: 19,
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // Icons
+  var icon0 = L.icon({
+    iconUrl: 'https://www.aishub.net/images/map/@2/type/64s.png',
+    iconSize: [17, 17],
+  });
+  
+  var icon1 = L.icon({
+    iconUrl: 'https://www.aishub.net/images/map/@2/type/4s.png',
+    iconSize: [17, 17],
+  });
+
+  // Fetch data
+  fetch('/api/data')
+    .then(response => response.json())
+    .then(data => {
+      data.stations.forEach(stations => {
+        var icon = stations.status === 0 ? icon0 : icon1;
+        var marker = L.marker([stations.lat, stations.lon], { icon: icon }).addTo(map);
+        
+        var popupHtml = generatePopupHtml(stations);
+        marker.bindPopup(popupHtml);
+        
+        marker.on('click', async () => {
+        try {
+          const stationData = await loadStationData(station.id);
+          const shipData = await loadShipData(station.id);
+
+          // Do something with stationData and shipData here...
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      });
+    });
+  })
+  .catch(error => console.error('Error:', error));
+</script>
+
+<!-------------------------------------------------------------------------------------------------------------------------------->
+<!-- pie chart -->
+<!-------------------------------------------------------------------------------------------------------------------------------->
+
+ <script>
+// URLs to fetch data from
+function createPieChart(shipTypeData) {
+    // Create pie chart after fetching data
+    let ctx = document.getElementById('myPieChart').getContext('2d');
+    let myPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: shipTypeData.labels,
+            datasets: [
+                {
+                    label:'Labels',
+                    data: shipTypeData.datasets[0].data,
+                    backgroundColor: shipTypeData.datasets[0].backgroundColor,
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Real-Time Data'
+            },
+            legend: {
+        position: 'right',
+        labels: {
+            generateLabels: function(chart) {
+                var data = chart.data;
+                if (data.labels.length && data.datasets.length) {
+                    return data.labels.map(function(label, i) {
+                        var total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        var value = data.datasets[0].data[i];
+                        var percentage = ((value / total) * 100).toFixed(2);
+                        return {
+                            // And finally : 
+                            text: label + ': ' + percentage + '%',
+                            fillStyle: data.datasets[0].backgroundColor[i],
+                            hidden: isNaN(value),
+
+                            // Extra data used for toggling the correct item
+                            index: i
+                        };
+                    });
+                } else {
+                    return [];
+                }
+            }
+        }
+    },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            }
+        }
+    });
+}
+</script>     
+<!------------------------------------------------------------------------------------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------------->
+<!----------------------------------차트-------------------------------------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------------->
+<script>
+function createLine1Chart(weeklyStatsData) {
+  // Convert your labels to readable format
+  const labels = weeklyStatsData.labels.map(label => convertTimestamp(label));
+
+  const ctx = document.getElementById('weeklyChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: labels, // your converted labels
+        datasets: [
+        {
+            label: 'Count',
+            data: weeklyStatsData.count, // your count values
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            fill: false
+        },
+        {
+            label: 'Distinct',
+            data: weeklyStatsData.distinct, // your distinct values
+            borderColor: 'rgba(255, 99, 132, 1)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            fill: false
+        }
+        ]
+    },
+    options: {
+        scales: {
+          x: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value, index, values) {
+                  // Show only every 5th label
+                  return index % 5 === 0 ? value : null;
+                },
+              }
+          },
+          y: {
+              beginAtZero: true
+          }
+        }
+    }
+  });
+}
+
+function convertTimestamp(timestamp) {
+    const date = new Date(timestamp * 1000);
+    const day = ("0" + date.getDate()).slice(-2); // Get day and format it to 'dd'
+    const month = ("0" + (date.getMonth() + 1)).slice(-2); // Get month and format it to 'mm'
+    return `${day}/${month}`; // Return in 'dd/mm' format
+}
+</script>   
+
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="/js/leaflet.rotatedMarker.js" ></script>    
+  <script src="/js/portInfo.js" ></script>    
+  <!-- plugins:js -->
+  <script src="/js/vendor.bundle.base.js"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page -->
+  <script src="/chart.js/Chart.min.js" ></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/bootstrap-datepicker/bootstrap-datepicker.min.js" ></script>
+  <!-- End plugin js for this page -->
+  <!-- inject:js -->
+  <script src="/jss/off-canvas.js" ></script>
+  <script src="/jss/hoverable-collapse.js" ></script>
+  <script src="/jss/template.js" ></script>
+  <script src="/jss/settings.js" ></script>
+
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+  <!-- End custom js for this page-->
+</body>
+</html>

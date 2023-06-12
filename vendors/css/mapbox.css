@@ -1,0 +1,63 @@
+
+.mapboxgl-popup.custom-popup {
+    font: Noto Sans
+    
+}
+
+.p0 .mapboxgl-popup-content {
+    padding: 7.5px;
+    border-radius: 5px;
+    background: var(--background)
+}
+
+.p0a .mapboxgl-popup-content {
+    padding: 5px;
+    border-radius: 5px
+}
+
+.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+    border-left-color: var(--background)
+}
+
+.mapboxgl-ctrl-group {
+    border-radius: 4px;
+    background: var(--background)
+}
+
+input[type=checkbox].toggle-switch {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    width: 45px;
+    height: 22.5px;
+    border: 2px solid #1e88e5;
+    border-radius: 22.5px;
+    background-color: var(--background);
+    outline: 0;
+    cursor: pointer;
+    transition: background-color 150ms ease-in-out;
+    position: relative
+}
+
+input[type=checkbox].toggle-switch::after {
+    content: '';
+    width: 19.5px;
+    height: 19.5px;
+    background-color: #1e88e5;
+    border-radius: 19.5px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: left 150ms ease-in-out;
+    transform: scale(.8)
+}
+
+input[type=checkbox].toggle-switch:checked {
+    background-color: #1e88e5
+}
+
+input[type=checkbox].toggle-switch:checked::after {
+    left: auto;
+    right: 0;
+    background-color: var(--background)
+}

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>운임</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css"/>
+    <link rel="stylesheet" href="/feather/feather.css" />
+    <link rel="stylesheet" href="/mdi/css/materialdesignicons.min.css"/>
+    <link rel="stylesheet" href="/ti-icons/css/themify-icons.css"/>
+    <link rel="stylesheet"  src="/typicons/typicons.css" />
+    <link rel="stylesheet"  href="/simple-line-icons/css/simple-line-icons.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/lux/bootstrap.min.css">
+    <link rel="stylesheet"  href="/css/vendor.bundle.base.css" />
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+  	<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    
+    <link rel="shortcut icon"  href="/images/favicon.png" />
+
+    <script src='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css' rel='stylesheet' />
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css' rel='stylesheet' />
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css' rel='stylesheet' />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+
+</head>
+    
+    <body>
+    <div class="container-scroller">
+    <%- include('./partials/navbar') %>
+     <class class="container-fluid page-body-wrapper">
+         <%- include('./partials/setting-panel') %>
+        <%- include('./partials/sidebar') %>
+            
+        <div class="container">
+            <div class="card text-center py-5 my-5">
+                <% if (typeof errorCheck!='undefined') { %>
+
+                <div class="alert alert-danger" role="alert">
+                    <strong><%=errorCheck %></strong>
+                </div>
+                <% } %>
+              <div class="card-body">
+                <h4 class="card-title">운 임 등 록</h4>
+                <form id="form" action="/rate/create" method="POST">
+        
+                        <div class="row text-left py-2" style="font-size: 14px;">
+                            <div hidden class="col-12">
+                              <input type="text" class="form-control" name="rateId" id="rateId">
+                            </div>
+                            <div class="col-6">
+                                <label for="liner">Liner</label>
+                                <input type="text" name="liner" class="form-control" id="liner" data-error="#errNm1" placeholder="Liner + Carrier">
+                                <small id="errNm1" class="form-text text-danger">  </small>
+                            </div>
+                            <div class="col-6">
+                                <label for="mode">Mode</label>
+                                <input type="text" name="mode" class="form-control" id="mode" data-error="#errNm2" placeholder="TCR,TSR...">
+                                <small id="errNm2" class="form-text text-danger">  </small>
+                            </div>
+                        </div>
+
+                        <div class="row text-left py-2" style="font-size: 14px;"></div>
+    
+                        <div class="row text-left py-2" style="font-size: 14px;">
+                            <div class="col-4">
+                                <label for="pol">POL</label>
+                                <input type="text" name="pol" class="form-control" id="pol" data-error="#errNm3" placeholder="Busan">
+                                <small id="errNm3" class="form-text text-danger">  </small>
+                            </div>
+                            <div class="col-4">
+                                <label for="pod">POD</label>
+                                <input type="text" name="pod" class="form-control" id="pod" data-error="#errNm4" placeholder="Qingdao">
+                                <small id="errNm4" class="form-text text-danger">  </small>
+                            </div>
+                            <div class="col-4">
+                                <label for="loading">L.Station</label>
+                                <input type="text" name="loading" class="form-control" id="loading" data-error="#errNm5" placeholder="Xian">
+                                <small id="errNm5" class="form-text text-danger">  </small>
+                            </div>
+                            <div class="col-4">
+                              <label for="discharge">D.Station</label>
+                              <input type="text" name="discharge" class="form-control" id="discharge" data-error="#errNm6" placeholder="Almaty">
+                              <small id="errNm6" class="form-text text-danger">  </small>
+                          </div>
+                          <div class="col-4">
+                            <label for="country">Country</label>
+                            <input type="text" name="country" class="form-control" id="country" data-error="#errNm7" placeholder="Kazhakhstan">
+                            <small id="errNm7" class="form-text text-danger">  </small>
+                        </div>
+                        <div class="col-4">
+                          <label for="dep">Department</label>
+                          <input type="text" name="dep" class="form-control" id="dep" data-error="#errNm8" placeholder="CIS">
+                          <small id="errNm8" class="form-text text-danger">  </small>
+                      </div>
+                      <div class="col-4">
+                        <label for="unit">Unit</label>
+                        <input type="text" name="unit" class="form-control" id="unit" data-error="#errNm9" placeholder="20, 40HC, Car, Wagon">
+                        <small id="errNm9" class="form-text text-danger">  </small>
+                    </div>
+                    </div>
+
+
+                    <div class="row text-left py-10" style="font-size: 14px;"></div>
+                        <h4 class="card-title">Rate</h4>
+                        <div hidden class="col-12">
+                            <input type="text" class="form-control" name="rateId" id="rateId">
+                          </div>
+
+                    
+                    <div class="row text-left py-10" style="font-size: 14px;">
+                        <div class="col-4">
+                        <label for="oft">OFT</label>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">$</div>
+                                <input type="number" name="oft" class="form-control" data-error="#errNm10" id="oft" placeholder="Ocean Freight Cost">
+                                </div>
+                                <small id="errNm10" class="form-text text-danger">  </small>
+                            </div>
+                            </div>
+                            <div class="col-4">
+                                <label for="lss">LSS</label>
+                                <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">$</div>
+                                    <input type="number" name="lss" class="form-control" data-error="#errNm11" id="lss" placeholder="">
+                                </div>
+                            </div>
+                                <small id="errNm11" class="form-text text-danger">  </small>
+                                </div>
+                       
+                            <div class="col-4">
+                            <label for="d_port">D.Port</label>
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">$</div>
+                                    <input type="number" name="d_port" class="form-control" data-error="#errNm12" id="d_port" placeholder="">
+                                    </div>
+                                </div>
+                                    <small id="errNm12" class="form-text text-danger">  </small>
+                                </div>
+                            <div class="col-4">
+                                <label for="rail">Rail</label>
+                                <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">$</div>
+                                    <input type="number" name="rail" class="form-control" data-error="#errNm13" id="rail" placeholder="Rail Freight">
+                                    </div>
+                                    </div>
+                                <small id="errNm13" class="form-text text-danger">  </small>
+                            </div>
+                        <div class="col-4">
+                        <label for="convoy">Convoy</label>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">$</div>
+                                <input type="number" name="convoy" class="form-control" data-error="#errNm14" id="convoy" placeholder="">
+                                </div>
+                            </div>
+                                <small id="errNm14" class="form-text text-danger">  </small>
+                    </div>
+                    <div class="col-4">
+                        <label for="d_thc">D_THC</label>
+                        <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">$</div>
+                            <input type="number" name="d_thc" class="form-control" data-error="#errNm15" id="d_thc" placeholder="">
+                            </div>
+                            </div>
+                            <small id="errNm15" class="form-text text-danger">  </small>
+                    </div>
+                        <div class="col-4">
+                        <label for="dpb">DPB</label>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">$</div>
+                                <input type="number" name="dpb" class="form-control" data-error="#errNm16" id="dpb" placeholder="">
+                                </div>
+                            </div>
+                                <small id="errNm16" class="form-text text-danger">  </small>
+                    </div>
+                    <div class="col-4">
+                        <label for="dps">DPS</label>
+                        <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">$</div>
+                            <input type="number" name="dps" class="form-control" data-error="#errNm17" id="dps" placeholder="">
+                            </div>
+                            </div>
+                            <small id="errNm17" class="form-text text-danger">  </small>
+                    </div>
+    
+                    <div class="col-4">
+                    <label for="ttl">Total</label>
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">$</div>
+                            <input type="number" name="ttl" class="form-control" data-error="#errNm18" id="ttl" placeholder="">
+                            </div>
+                        </div>
+                            <small id="errNm18" class="form-text text-danger">  </small>
+                </div>
+                    <div class="col-4">
+                        <label for="valid">Validity</label>
+                        <input type="date" name="valid" class="form-control" id="valid" data-error="#errNm19" placeholder="">
+                        <small id="errNm19" class="form-text text-danger">  </small>
+                    </div>
+    
+                    <div class="col-4">
+                    <label for="remark">Remark</label>
+                    <input type="text" name="remark" class="form-control" id="remark" data-error="#errNm20" placeholder="">
+                          <small id="errNm20" class="form-text text-danger">  </small>
+                      </div>
+                   <form action="/rate/upload" method="post" enctype="multipart/form-data">
+                        <div class="col-12">
+                            <label for="file">Upload XLSX</label>
+                            <input type="file" name="file" class="form-control" id="file" accept=".xlsx" required>
+                        </div>
+                        <button type="submit">Upload</button>
+                    </form>
+                    </div>
+                    
+                <div class="text-left">
+                    <button type="submit"  class="btn btn-outline-primary" style="width: 180px; font-size: 14px;">운임 등록</button>
+                    <a class="btn btn-outline-info" href="/rate/rates" role="button" style="width: 180px; font-size: 14px;">리스트</a>
+                </div>
+                </form>
+              </div>
+            </div>
+        </div>
+        </class>
+        </div>
+
+    <%- include('./partials/footer') %>
+        
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    $("#form").on("submit", function(e) {
+        e.preventDefault();
+
+        // First, upload the file
+        var formData = new FormData();
+        formData.append('file', $('#file')[0].files[0]);
+        
+        $.ajax({
+            url : '/rate/upload',
+            type : 'POST',
+            data : formData,
+            processData: false,
+            contentType: false,
+            success : function(data) {
+                console.log('File has been uploaded');
+                
+                // Then, create the Rate
+                $.ajax({
+                    url : '/rate/create',
+                    type : 'POST',
+                    data : $("#form").serialize(),
+                    success : function(data) {
+                        console.log('Rate has been created');
+                    }
+                });
+            }
+        });
+    });
+});
+</script>
+
+   
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+     integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+     integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</body>
+</html>

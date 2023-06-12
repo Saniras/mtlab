@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>MTL Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet"  href="/css/port.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css"/>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include DataTables -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+     <link rel="stylesheet"  href="/css/style.css" />
+      
+     <style>
+         body { margin: 0; padding: 0;}
+
+         .legend-ctrl {
+             margin-right: 10px;
+             background: var(--gray-600-transparent-16);
+                color: var(--grey-900)
+              border-radius: 5px;
+              padding: 5px 10px;
+              margin: 10px;
+              box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
+         }
+      </style>
+  </head>
+    
+<body>
+ 
+      <div id="app" class="height widthf abs top bottom left right">
+         <div class="col widthf heightf mapboxgl-map">
+             <div class="row b0 sh0 widthf y-center stc left nowrap height5" style="display: flex; z-index: 10000;">
+             </div>
+             
+          
+        <div class="col scroll widthf heightf">
+            <div class="col widthf heightf" style="display: flex;">
+                <div class="col widthf heightf">
+                    <div class="abs widthf heightf" style="pointer-events: none;"></div>
+                    <div class="col widthf heightf">
+                        <div class="col f1">
+                            <div class="rigid b0 rad3 sh0 widthf heightf rel">
+                                <div class="col widthf heightf mapboxgl-map">
+                                    <div class="mapboxgl-canary" style="visibility: hidden;"></div>
+                                    <div class="mapboxgl-canvas-container mapboxgl-interactive mapboxgl-touch-drag-pan mapboxgl-touch-zoom-rotate">
+                                        <div id="map" tabindex="0" aria-label="Map" width="2880" height="1348" style="width: 100%; height: 674px;"></div>
+
+                                            
+                                        </div>
+                                    </div>
+                              </div>                 
+                            </div>
+                                                   </div>
+                       </div>
+                    </div>
+                </div>
+                  </div>
+                </div>
+
+<!------------------------------------------------------------------------------------------------------------------------------>
+<!------------------------------------------------------------------------------------------------------------------------------>
+<!------------------------------------------------------------------------------------------------------------------------------>
+<!------------------------------------------------------------------------------------------------------------------------------>
+<!------------------------------------------------------------------------------------------------------------------------------>
+<!------------------------------------------------------------------------------------------------------------------------------>
+        <!-- content-wrapper ends -->
+        <!-- partial:/partials/_footer.html -->
+
+
+<script>
+var startLat = 44;
+var startLon = 12;
+var startZoom = 2.4;
+mapboxgl.accessToken = 'pk.eyJ1IjoiY2FycmllLXhpYSIsImEiOiJja3Z0NDVtMzczZWpnMm9tdG92eHgxZXo5In0.DQ9J_C1Np1kl0Slf4EVoMA';
+class ResetControl {
+    onAdd(map) {
+        this.map = map;
+        this.container = document.createElement('div');
+        this.container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+        this.button = document.createElement('button');
+        this.button.className = 'mapboxgl-ctrl-icon mapboxgl-ctrl-reset';
+        this.button.textContent = 'R';
+        this.container.appendChild(this.button);
+        this.button.addEventListener('click', () => this.reset());
+        return this.container;
+    }
+    onRemove() {
+        this.container.parentNode.removeChild(this.container);
+        this.map = undefined;
+    }
+
+    reset() {
+        this.map.flyTo({
+            center: [startLon, startLat],
+            zoom: startZoom
+        });
+    }
+}
+var map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/light-v10',
+    center: [44, 12],
+  zoom: 2.3
+});
+    
+    class LegendControl{
+        onAdd(map) {
+            this.map = map;
+            this._container = document.createElement('div');
+            this._container.className = 'legend-ctrl';
+            this._container.innerHTML = 'Click a marker...';
+            return this._container;
+                    }
+            onRemove(){
+                this.container.parentNode.removeChild(this._container);
+                this._map = undefined;
+            }
+         updateHTML(html) { // renamed the function
+           this._container.innerHTML = html; // changed to innerHTML
+          }
+        }
+    
+  const legendControl = new LegendControl();
+    
+    map.addControl(legendControl, 'bottom-left');
+
+    
+const resetControl = new ResetControl();
+    map.addControl(resetControl, 'top-right');
+
+    map.on('load', function () {
+        fetch('/api/cys')
+            .then((response) => response.json())
+            .then((cysData) => {
+                cysData.forEach((cy) => {
+                    const lat = parseFloat(cy.lat);
+                    const lon = parseFloat(cy.lon);
+
+                    // Create a marker for each port
+                    const el = document.createElement('div');
+                    el.className = 'marker';
+                    el.style.backgroundImage = 'url(/icons/port.png)'; // Assumed path of icon
+
+                    // Add event listeners for marker enter and leave events
+                    el.addEventListener('mouseenter', () => el.style.backgroundImage = 'url(/icons/port-selected.png)');// Assumed path of selected icon
+                    el.addEventListener('mouseleave', () => el.style.backgroundImage = 'url(/icons/port.png)');
+
+                    var marker = new mapboxgl.Marker(el)
+                        .setLngLat([lon, lat])
+                        .addTo(map);
+
+                    var popup = new mapboxgl.Popup({ offset: 65, className: 'custom-popup' })
+                        .setHTML(`
+                            <p>${cy.port}<p>
+                            <p>${cy.country}</p>        
+                            
+                        `);
+
+                    marker.setPopup(popup);
+
+                    // Show the popup on mouseenter
+                    el.addEventListener('mouseenter', () => marker.togglePopup());
+
+                    // Hide the popup on mouseleave
+                    el.addEventListener('mouseleave', () => marker.togglePopup());
+                    
+                    // Fly to the clicked port
+                    el.addEventListener('click', () => {
+                        map.flyTo({center: [lon, lat], zoom: 12});
+                    
+                       // Sample HTML, replace this with your actual HTML
+                let htmlContent = 
+                    `<div class="mapboxgl-ctrl-bottom-left">
+                    <div class="col sh0 b0 rad2 m1  sh0 b0 rad2 m1" style="max-height: 549px; min-width: 500px; overflow: hidden auto; width: 720px; pointer-events: all";>
+                    <div style="font-family: Lato, sans-serif; pointer-events: none;">
+    <div class="col sh0 b0 rad2 m1 sh0 b0 rad2 m1" style="max-height: 549px; min-width: 500px; overflow: hidden auto; width: 720px; pointer-events: all;">
+        <div class="rows widthf baseline wrap pt0 pl1 pr1">
+            <span class="l1a w2 mr1">${cy.port}</span><span class="l1 c1 mr1 t-noov">${cy.global_trade}% of global trade</span>
+            <a class="ptr l1 c2 mr1" href=""><span class="u-transparent u-light hvr-u2">№1524</span></a>
+            <a class="ptr l1 c2 mr1" href=""><span class="u-transparent u-light hvr-u2">Detailed page</span></a>
+            <a class="ptr l1 c2" href=""><span class="u-transparent u-light hvr-u2">Country ports</span></a>
+            <div class="mla stc top">
+                <div class="width2 height2 lheight2 rigid b2 t-center ptr rad50 nosel sh0 hvr-b2a hvr-c2" tabindex="0"><i class="fas fa-times"></i></div>
+            </div>
+        </div>
+        <div class="rows l1 ml1">
+            <div class="mr1">Exports: 0%</div>
+            <div class="mr1">Imports: 0%</div>
+            <div class="mr1">Transshipments: 0%</div>
+            <div class="mr1">Rail freight: N/A</div>
+        </div>
+        <div class="rows widthf" style="min-width: 885px;">
+            <div class="col widthf">
+                <div class="col b0 rad2 sh0 rel m1" style="width: 100%; height: 262px; padding: 2px; pointer-events: auto; max-height: 220px; margin: 0px; box-shadow: 0px 0px 0px 0px;">
+                    <div class="rows heightf widthf" style="min-height: 0%;">
+                        <div class="col f1 widthf heightf">
+                            <div class="col widthf heightf f3 rel b0" t="0.5183132367861052" style="">
+                                <div class="abs widthf rows y-center pt0 z1 abs" t="0.18462134327552815" style="padding-left: 30.8438px;">
+                                    <div class="rows"><span class="w2 mr1">Container vessels in port by week</span></div>
+                                    <div class="mla"></div>
+                                    <div class="rows y-center">
+                                        <i class="la la-calendar pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i>
+                                      	<i class="la la-th-list pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i>
+                                        <i class="la la-camera pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i>
+                                      	<i class="la la-file-export pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i>
+                                        <i class="la la-share-square pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i>
+                                      	<i class="la la-arrows-alt pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i>
+                                    </div>
+                                </div>
+                                <svg class="" style="width: 446px; height: 216px; overflow-x: visible;">
+                                    <g class="" t="0.5254716575567322" fill="none" font-size="10" font-family="sans-serif" text-anchor="middle" style="font-size: 12px; transform: translate(0px, 154px);">
+                                        <path class="domain" stroke="currentColor" d="M30.84375,0H434"></path>
+                                        <g class="tick" opacity="1" transform="translate(78.21851325757575,0)">
+                                            <line stroke="currentColor" y2="0"></line>
+                                            <text fill="currentColor" y="3" dy="0.71em">April</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(161.80752840909088,0)">
+                                            <line stroke="currentColor" y2="0"></line>
+                                            <text fill="currentColor" y="3" dy="0.71em">July</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(246.31510416666669,0)">
+                                            <line stroke="currentColor" y2="0"></line>
+                                            <text fill="currentColor" y="3" dy="0.71em">October</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(330.8226799242424,0)">
+                                            <line stroke="currentColor" y2="0"></line>
+                                            <text fill="currentColor" y="3" dy="0.71em">2023</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(413.493134469697,0)">
+                                            <line stroke="currentColor" y2="0"></line>
+                                            <text fill="currentColor" y="3" dy="0.71em">April</text>
+                                        </g>
+                                    </g>
+                                    <g class="" t="0.8250364637712377" fill="none" font-size="10" font-family="sans-serif" text-anchor="end" style="font-size: 12px; transform: translate(30.8438px, 0px);">
+                                        <path class="domain" stroke="currentColor" d="M0,154V45.5"></path>
+                                        <g class="tick" opacity="1" transform="translate(0,144.95833333333331)">
+                                            <line stroke="currentColor" x2="0"></line>
+                                            <text fill="currentColor" x="-3" dy="0.32em">0</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,126.875)">
+                                            <line stroke="currentColor" x2="0"></line>
+                                            <text fill="currentColor" x="-3" dy="0.32em">0.2</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,108.79166666666667)">
+                                            <line stroke="currentColor" x2="0"></line>
+                                            <text fill="currentColor" x="-3" dy="0.32em">0.4</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,90.70833333333334)">
+                                            <line stroke="currentColor" x2="0"></line>
+                                            <text fill="currentColor" x="-3" dy="0.32em">0.6</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,72.625)">
+                                            <line stroke="currentColor" x2="0"></line>
+                                            <text fill="currentColor" x="-3" dy="0.32em">0.8</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,54.54166666666667)">
+                                            <line stroke="currentColor" x2="0"></line>
+                                            <text fill="currentColor" x="-3" dy="0.32em">1</text>
+                                        </g>
+                                    </g>
+                                    <g class="" t="0.8162898445892535" fill="none" font-size="10" font-family="sans-serif" text-anchor="start" style="font-size: 12px; transform: translate(434px, 0px);">
+                                        <path class="domain" stroke="currentColor" d="M0,154V45.5"></path>
+                                    </g>
+                                    <g
+                                        class=""
+                                        fill="none"
+                                        font-size="10"
+                                        font-family="sans-serif"
+                                        text-anchor="start"
+                                        style="opacity: 0.2; stroke-dasharray: 4, 2; stroke-width: 1; pointer-events: none; transform: translate(30.8438px, 0px);"
+                                    >
+                                        <path class="domain" stroke="currentColor" d="M403.15625,154H0V45.5H403.15625"></path>
+                                        <g class="tick" opacity="1" transform="translate(0,154)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,144.95833333333331)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,135.91666666666669)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,126.875)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,117.83333333333334)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,108.79166666666667)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,99.75000000000001)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,90.70833333333334)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,81.66666666666669)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,72.625)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,63.58333333333334)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,54.54166666666667)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,45.5)">
+                                            <line stroke="currentColor" x2="403.15625"></line>
+                                            <text fill="currentColor" x="406.15625" dy="0.32em"></text>
+                                        </g>
+                                    </g>
+                                    <g
+                                        class=""
+                                        fill="none"
+                                        font-size="10"
+                                        font-family="sans-serif"
+                                        text-anchor="middle"
+                                        style="opacity: 0.2; stroke-dasharray: 4, 2; stroke-width: 1; pointer-events: none; transform: translate(0px, 45.5px);"
+                                    >
+                                        <path class="domain" stroke="currentColor" d="M30.84375,108.5V0H434V108.5"></path>
+                                        <g class="tick" opacity="1" transform="translate(49.74313446969697,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(78.21851325757575,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(105.77533143939394,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(134.25071022727272,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(161.80752840909088,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(190.2829071969697,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(218.75828598484847,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(246.31510416666669,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(274.79048295454544,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(302.3473011363637,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(330.8226799242424,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(359.2980587121212,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(385.0177556818182,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(413.493134469697,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                    </g>
+                                    <clipPath class="" id="0.024964632389353092" style="transform: translate(30.8438px, 45.5px);"><rect class="" width="403.15625" height="108.5"></rect></clipPath>
+                                    <g class="" clip-path="url(#0.024964632389353092)">
+                                        <path
+                                            class=""
+                                            fill="none"
+                                            opacity="1"
+                                            stroke="#3d57a7"
+                                            stroke-width="2"
+                                            d="M49.16903409090909,144.95833333333331L55.59895833333333,144.95833333333331M81.31865530303031,144.95833333333331ZM113.46827651515152,144.95833333333331L119.89820075757575,144.95833333333331M158.47774621212122,144.95833333333331ZM184.1974431818182,144.95833333333331ZM229.20691287878788,144.95833333333331ZM332.0857007575758,144.95833333333331L338.515625,144.95833333333331L344.94554924242425,144.95833333333331L409.2447916666667,144.95833333333331L415.67471590909093,144.95833333333331"
+                                            stroke-dasharray=""
+                                        ></path>
+                                        <path class="" fill="none" opacity="1" stroke="#3d57a7" stroke-width="2" d="M49.16903409090909,144.95833333333331Z" stroke-dasharray="2 2"></path>
+                                        <path
+                                            class=""
+                                            fill="none"
+                                            opacity="1"
+                                            stroke="#3d57a7"
+                                            stroke-width="2"
+                                            d="M55.59895833333333,144.95833333333331L81.31865530303031,144.95833333333331L113.46827651515152,144.95833333333331"
+                                            stroke-dasharray="2 2"
+                                        ></path>
+                                        <path
+                                            class=""
+                                            fill="none"
+                                            opacity="1"
+                                            stroke="#3d57a7"
+                                            stroke-width="2"
+                                            d="M119.89820075757575,144.95833333333331L158.47774621212122,144.95833333333331L184.1974431818182,144.95833333333331L229.20691287878788,144.95833333333331L332.0857007575758,144.95833333333331"
+                                            stroke-dasharray="2 2"
+                                        ></path>
+                                        <path class="" fill="none" opacity="1" stroke="#3d57a7" stroke-width="2" stroke-dasharray="2 2"></path>
+                                        <circle class="" cx="81.31865530303031" cy="144.95833333333331" r="3" fill="#3d57a7"></circle>
+                                        <circle class="" cx="158.47774621212122" cy="144.95833333333331" r="3" fill="#3d57a7"></circle>
+                                        <circle class="" cx="184.1974431818182" cy="144.95833333333331" r="3" fill="#3d57a7"></circle>
+                                        <circle class="" cx="229.20691287878788" cy="144.95833333333331" r="3" fill="#3d57a7"></circle>
+                                        <path
+                                            class=""
+                                            fill="none"
+                                            opacity="1"
+                                            stroke="#ff7f0e"
+                                            stroke-width="2"
+                                            d="M49.16903409090909,144.95833333333331L55.59895833333333,144.95833333333331M81.31865530303031,54.54166666666667ZM113.46827651515152,144.95833333333331L119.89820075757575,144.95833333333331M158.47774621212122,144.95833333333331ZM184.1974431818182,144.95833333333331ZM229.20691287878788,144.95833333333331ZM332.0857007575758,129.88888888888889L338.515625,93.29166666666667L344.94554924242425,144.95833333333331L409.2447916666667,144.95833333333331L415.67471590909093,144.95833333333331"
+                                            stroke-dasharray=""
+                                        ></path>
+                                        <path class="" fill="none" opacity="1" stroke="#ff7f0e" stroke-width="2" d="M49.16903409090909,144.95833333333331Z" stroke-dasharray="2 2"></path>
+                                        <path
+                                            class=""
+                                            fill="none"
+                                            opacity="1"
+                                            stroke="#ff7f0e"
+                                            stroke-width="2"
+                                            d="M55.59895833333333,144.95833333333331L81.31865530303031,54.54166666666667L113.46827651515152,144.95833333333331"
+                                            stroke-dasharray="2 2"
+                                        ></path>
+                                        <path
+                                            class=""
+                                            fill="none"
+                                            opacity="1"
+                                            stroke="#ff7f0e"
+                                            stroke-width="2"
+                                            d="M119.89820075757575,144.95833333333331L158.47774621212122,144.95833333333331L184.1974431818182,144.95833333333331L229.20691287878788,144.95833333333331L332.0857007575758,129.88888888888889"
+                                            stroke-dasharray="2 2"
+                                        ></path>
+                                        <path class="" fill="none" opacity="1" stroke="#ff7f0e" stroke-width="2" stroke-dasharray="2 2"></path>
+                                        <circle class="" cx="81.31865530303031" cy="54.54166666666667" r="3" fill="#ff7f0e"></circle>
+                                        <circle class="" cx="158.47774621212122" cy="144.95833333333331" r="3" fill="#ff7f0e"></circle>
+                                        <circle class="" cx="184.1974431818182" cy="144.95833333333331" r="3" fill="#ff7f0e"></circle>
+                                        <circle class="" cx="229.20691287878788" cy="144.95833333333331" r="3" fill="#ff7f0e"></circle>
+                                    </g>
+                                    <g class="" display="none"><rect class="" width="2" height="108.5" x="-17451.329071969696" y="45.5" fill="rgb(255, 255, 255)" fill-opacity="0.25" pointer-events="none"></rect></g>
+                                    <g class="" clip-path="url(#0.024964632389353092)"></g>
+                                </svg>
+                                <span class="l1" t="0.8193350818223275" style="padding-left: 30.8438px;"></span>
+                                <div class="" t="0.699280464213454" style="z-index: 9998;">
+                                    <div class="rows nowrap" style="padding-left: 22.8438px; overflow-x: auto;">
+                                        <div class="col y-top" style="min-width: fit-content; min-height: 42px; cursor: default; opacity: 1;">
+                                            <div class="rows hvr-b1a rad2 b0 ptr" style="padding-top: 1px; padding-right: 6px; padding-bottom: 1px;">
+                                                <svg class="rigid" viewBox="0 0 26 20" style="width: 26px; height: 20px;">
+                                                    <path class="" transform="translate(13, 10)" d="M -7 0 L 7 0" style="stroke: rgb(255, 127, 14); fill: rgb(255, 127, 14); stroke-width: 2px;"></path>
+                                                </svg>
+                                                <div class="l1 lheight1a">Vessels in port</div>
+                                            </div>
+                                            <div class="rows pl0 l1 lheight1a c1 t-mono pre t-top"></div>
+                                        </div>
+                                        <div class="col y-top" style="min-width: fit-content; min-height: 42px; cursor: default; opacity: 1;">
+                                            <div class="rows hvr-b1a rad2 b0 ptr" style="padding-top: 1px; padding-right: 6px; padding-bottom: 1px;">
+                                                <svg class="rigid" viewBox="0 0 26 20" style="width: 26px; height: 20px;">
+                                                    <path class="" transform="translate(13, 10)" d="M -7 0 L 7 0" style="stroke: rgb(61, 87, 167); fill: rgb(61, 87, 167); stroke-width: 2px;"></path>
+                                                </svg>
+                                                <div class="l1 lheight1a">Vessels waiting</div>
+                                            </div>
+                                            <div class="rows pl0 l1 lheight1a c1 t-mono pre t-top"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col b0 rad2 sh0 rel m1" style="width: 100%; height: 262px; padding: 2px; pointer-events: auto; max-height: 220px; margin: 0px; box-shadow: 0px 0px 0px 0px;">
+                    <div class="row heightf widthf" style="min-height: 0%;">
+                        <div class="col f1 widthf heightf">
+                            <div class="col widthf heightf f3 rel b0" t="0.37684462932761154" style="">
+                                <div class="abs widthf row y-center pt0 z1 abs" t="0.30733074810804273" style="padding-left: 22.1094px;">
+                                    <div class="row"><span class="w2 mr1">Port arrivals and departures</span></div>
+                                    <div class="mla"></div>
+                                    <div class="row y-center">
+                                        <i class="la la-calendar pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i><i class="la la-th-list pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i>
+                                        <i class="la la-camera pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i><i class="la la-file-export pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i>
+                                        <i class="la la-share-square pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i><i class="la la-cog pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i>
+                                        <i class="la la-arrows-alt pl0 pr0 l1a hvr-b1a height2 ptr rad1 dim3 hvr-dim0"></i>
+                                    </div>
+                                </div>
+                                <svg class="" style="width: 446px; height: 216px; overflow-x: visible;">
+                                    <g class="" t="0.5436326817194659" fill="none" font-size="10" font-family="sans-serif" text-anchor="middle" style="font-size: 12px; transform: translate(0px, 154px);">
+                                        <path class="domain" stroke="currentColor" d="M22.109375,0H434"></path>
+                                        <g class="tick" opacity="1" transform="translate(23.50318816306933,0)">
+                                            <line stroke="currentColor" y2="0"></line>
+                                            <text fill="currentColor" y="3" dy="0.71em">2022</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(91.31031501509054,0)">
+                                            <line stroke="currentColor" y2="0"></line>
+                                            <text fill="currentColor" y="3" dy="0.71em">April</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(159.87085438768977,0)">
+                                            <line stroke="currentColor" y2="0"></line>
+                                            <text fill="currentColor" y="3" dy="0.71em">July</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(229.18480628086704,0)">
+                                            <line stroke="currentColor" y2="0"></line>
+                                            <text fill="currentColor" y="3" dy="0.71em">October</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(298.49875817404427,0)">
+                                            <line stroke="currentColor" y2="0"></line>
+                                            <text fill="currentColor" y="3" dy="0.71em">2023</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(366.3058850260655,0)">
+                                            <line stroke="currentColor" y2="0"></line>
+                                            <text fill="currentColor" y="3" dy="0.71em">April</text>
+                                        </g>
+                                    </g>
+                                    <g class="" t="0.18365119887512193" fill="none" font-size="10" font-family="sans-serif" text-anchor="end" style="font-size: 12px; transform: translate(22.1094px, 0px);">
+                                        <path class="domain" stroke="currentColor" d="M0,154V45.5"></path>
+                                        <g class="tick" opacity="1" transform="translate(0,144.95833333333331)">
+                                            <line stroke="currentColor" x2="0"></line>
+                                            <text fill="currentColor" x="-3" dy="0.32em">0</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,126.875)">
+                                            <line stroke="currentColor" x2="0"></line>
+                                            <text fill="currentColor" x="-3" dy="0.32em">1</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,108.79166666666666)">
+                                            <line stroke="currentColor" x2="0"></line>
+                                            <text fill="currentColor" x="-3" dy="0.32em">2</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,90.70833333333333)">
+                                            <line stroke="currentColor" x2="0"></line>
+                                            <text fill="currentColor" x="-3" dy="0.32em">3</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,72.625)">
+                                            <line stroke="currentColor" x2="0"></line>
+                                            <text fill="currentColor" x="-3" dy="0.32em">4</text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,54.54166666666667)">
+                                            <line stroke="currentColor" x2="0"></line>
+                                            <text fill="currentColor" x="-3" dy="0.32em">5</text>
+                                        </g>
+                                    </g>
+                                    <g class="" t="0.7258561989176904" fill="none" font-size="10" font-family="sans-serif" text-anchor="start" style="font-size: 12px; transform: translate(434px, 0px);">
+                                        <path class="domain" stroke="currentColor" d="M0,154V45.5"></path>
+                                    </g>
+                                    <g
+                                        class=""
+                                        fill="none"
+                                        font-size="10"
+                                        font-family="sans-serif"
+                                        text-anchor="start"
+                                        style="opacity: 0.2; stroke-dasharray: 4, 2; stroke-width: 1; pointer-events: none; transform: translate(22.1094px, 0px);"
+                                    >
+                                        <path class="domain" stroke="currentColor" d="M411.890625,154H0V45.5H411.890625"></path>
+                                        <g class="tick" opacity="1" transform="translate(0,154)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,144.95833333333331)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,135.91666666666669)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,126.875)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,117.83333333333334)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,108.79166666666666)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,99.75)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,90.70833333333333)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,81.66666666666667)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,72.625)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,63.58333333333333)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,54.54166666666667)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(0,45.5)">
+                                            <line stroke="currentColor" x2="411.890625"></line>
+                                            <text fill="currentColor" x="414.890625" dy="0.32em"></text>
+                                        </g>
+                                    </g>
+                                    <g
+                                        class=""
+                                        fill="none"
+                                        font-size="10"
+                                        font-family="sans-serif"
+                                        text-anchor="middle"
+                                        style="opacity: 0.2; stroke-dasharray: 4, 2; stroke-width: 1; pointer-events: none; transform: translate(0px, 45.5px);"
+                                    >
+                                        <path class="domain" stroke="currentColor" d="M22.109375,108.5V0H434V108.5"></path>
+                                        <g class="tick" opacity="1" transform="translate(23.50318816306933,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(91.31031501509054,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(159.87085438768977,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(229.18480628086704,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(298.49875817404427,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                        <g class="tick" opacity="1" transform="translate(366.3058850260655,0)">
+                                            <line stroke="currentColor" y2="108.5"></line>
+                                            <text fill="currentColor" y="111.5" dy="0.71em"></text>
+                                        </g>
+                                    </g>
+                                    <clipPath class="" id="0.5356924661930313" style="transform: translate(22.1094px, 45.5px);"><rect class="" width="411.890625" height="108.5"></rect></clipPath>
+                                    <g class="" clip-path="url(#0.5356924661930313)">
+                                        <g class="">
+                                            <rect class="" opacity="1" fill="#d62728" x="39.03167613636364" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="44.305563780409734" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="49.579451424455826" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="54.853339068501924" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="60.12722671254802" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="65.4011143565941" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="70.6750020006402" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="75.9488896446863" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="81.22277728873239" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="86.4966649327785" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="91.7705525768246" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="97.04444022087068" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="102.31832786491677" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="107.59221550896288" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="112.86610315300896" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="118.13999079705506" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="123.41387844110115" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="128.68776608514725" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="133.96165372919333" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="139.23554137323944" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="144.50942901728553" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="149.78331666133164" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="155.0572043053777" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="160.3310919494238" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="165.6049795934699" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="170.87886723751598" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="176.1527548815621" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="181.4266425256082" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="186.7005301696543" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="191.97441781370037" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="197.24830545774645" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="202.52219310179254" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="207.79608074583865" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="213.06996838988476" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="218.34385603393085" y="90.70833333333333" height="18.08333333333333" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="223.61774367797696" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="228.89163132202304" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="234.16551896606913" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="239.43940661011524" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="244.71329425416133" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="249.9871818982074" y="90.70833333333333" height="18.08333333333333" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="255.2610695422535" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="260.5349571862996" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="265.8088448303457" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="271.0827324743918" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="276.3566201184379" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="281.630507762484" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="286.90439540653006" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="292.17828305057617" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="297.4521706946222" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="302.7260583386684" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="307.99994598271445" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="313.27383362676056" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="318.5477212708067" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="323.82160891485273" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="329.09549655889884" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="334.3693842029449" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="339.64327184699107" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="344.9171594910371" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="350.19104713508324" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="355.46493477912935" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="360.73882242317535" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="366.0127100672215" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="371.2865977112676" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="376.5604853553137" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="381.8343729993598" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="387.10826064340586" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="392.38214828745197" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="397.656035931498" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="402.9299235755442" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="408.20381121959025" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#d62728" x="413.47769886363636" y="144.95833333333331" height="0" width="3.6"></rect>
+                                        </g>
+                                        <g class="">
+                                            <rect class="" opacity="1" fill="#3d57a7" x="39.03167613636364" y="72.625" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="44.305563780409734" y="72.625" height="72.33333333333331" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="49.579451424455826" y="108.79166666666666" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="54.853339068501924" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="60.12722671254802" y="72.625" height="54.25" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="65.4011143565941" y="54.54166666666667" height="54.249999999999986" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="70.6750020006402" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="75.9488896446863" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="81.22277728873239" y="72.625" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="86.4966649327785" y="54.54166666666667" height="72.33333333333333" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="91.7705525768246" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="97.04444022087068" y="90.70833333333333" height="54.249999999999986" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="102.31832786491677" y="54.54166666666667" height="90.41666666666664" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="107.59221550896288" y="108.79166666666666" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="112.86610315300896" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="118.13999079705506" y="54.54166666666667" height="72.33333333333333" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="123.41387844110115" y="90.70833333333333" height="54.249999999999986" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="128.68776608514725" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="133.96165372919333" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="139.23554137323944" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="144.50942901728553" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="149.78331666133164" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="155.0572043053777" y="90.70833333333333" height="18.08333333333333" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="160.3310919494238" y="90.70833333333333" height="54.249999999999986" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="165.6049795934699" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="170.87886723751598" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="176.1527548815621" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="181.4266425256082" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="186.7005301696543" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="191.97441781370037" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="197.24830545774645" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="202.52219310179254" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="207.79608074583865" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="213.06996838988476" y="90.70833333333333" height="54.249999999999986" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="218.34385603393085" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="223.61774367797696" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="228.89163132202304" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="234.16551896606913" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="239.43940661011524" y="90.70833333333333" height="36.16666666666667" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="244.71329425416133" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="249.9871818982074" y="108.79166666666666" height="18.083333333333343" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="255.2610695422535" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="260.5349571862996" y="108.79166666666666" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="265.8088448303457" y="72.625" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="271.0827324743918" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="276.3566201184379" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="281.630507762484" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="286.90439540653006" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="292.17828305057617" y="108.79166666666666" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="297.4521706946222" y="90.70833333333333" height="54.249999999999986" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="302.7260583386684" y="90.70833333333333" height="54.249999999999986" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="307.99994598271445" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="313.27383362676056" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="318.5477212708067" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="323.82160891485273" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="329.09549655889884" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="334.3693842029449" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="339.64327184699107" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="344.9171594910371" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="350.19104713508324" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="355.46493477912935" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="360.73882242317535" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="366.0127100672215" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="371.2865977112676" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="376.5604853553137" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="381.8343729993598" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="387.10826064340586" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="392.38214828745197" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="397.656035931498" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="402.9299235755442" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="408.20381121959025" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#3d57a7" x="413.47769886363636" y="144.95833333333331" height="0" width="3.6"></rect>
+                                        </g>
+                                        <g class="">
+                                            <rect class="" opacity="1" fill="#2ca02c" x="39.03167613636364" y="108.79166666666666" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="44.305563780409734" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="49.579451424455826" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="54.853339068501924" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="60.12722671254802" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="65.4011143565941" y="108.79166666666666" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="70.6750020006402" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="75.9488896446863" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="81.22277728873239" y="108.79166666666666" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="86.4966649327785" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="91.7705525768246" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="97.04444022087068" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="102.31832786491677" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="107.59221550896288" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="112.86610315300896" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="118.13999079705506" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="123.41387844110115" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="128.68776608514725" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="133.96165372919333" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="139.23554137323944" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="144.50942901728553" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="149.78331666133164" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="155.0572043053777" y="108.79166666666666" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="160.3310919494238" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="165.6049795934699" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="170.87886723751598" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="176.1527548815621" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="181.4266425256082" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="186.7005301696543" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="191.97441781370037" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="197.24830545774645" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="202.52219310179254" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="207.79608074583865" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="213.06996838988476" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="218.34385603393085" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="223.61774367797696" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="228.89163132202304" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="234.16551896606913" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="239.43940661011524" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="244.71329425416133" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="249.9871818982074" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="255.2610695422535" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="260.5349571862996" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="265.8088448303457" y="108.79166666666666" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="271.0827324743918" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="276.3566201184379" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="281.630507762484" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="286.90439540653006" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="292.17828305057617" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="297.4521706946222" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="302.7260583386684" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="307.99994598271445" y="108.79166666666666" height="36.16666666666666" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="313.27383362676056" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="318.5477212708067" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="323.82160891485273" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="329.09549655889884" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="334.3693842029449" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="339.64327184699107" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="344.9171594910371" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="350.19104713508324" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="355.46493477912935" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="360.73882242317535" y="126.875" height="18.083333333333314" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="366.0127100672215" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="371.2865977112676" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="376.5604853553137" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="381.8343729993598" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="387.10826064340586" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="392.38214828745197" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="397.656035931498" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="402.9299235755442" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="408.20381121959025" y="144.95833333333331" height="0" width="3.6"></rect>
+                                            <rect class="" opacity="1" fill="#2ca02c" x="413.47769886363636" y="144.95833333333331" height="0" width="3.6"></rect>
+                                        </g>
+                                    </g>
+                                    <g class="" display="none"><rect class="" width="2" height="108.5" x="-14286.778285479924" y="45.5" fill="rgb(255, 255, 255)" fill-opacity="0.25" pointer-events="none"></rect></g>
+                                    <g class="" clip-path="url(#0.5356924661930313)"></g>
+                                </svg>
+                                <span class="l1" t="0.8640765305137863" style="padding-left: 22.1094px;"></span>
+                                <div class="" t="0.3734764137657052" style="z-index: 9998;">
+                                    <div class="row nowrap" style="padding-left: 14.1094px; overflow-x: auto;">
+                                        <div class="col y-top" style="min-width: fit-content; min-height: 42px; cursor: default; opacity: 1;">
+                                            <div class="row hvr-b1a rad2 b0 ptr" style="padding-top: 1px; padding-right: 6px; padding-bottom: 1px;">
+                                                <svg class="rigid" viewBox="0 0 26 20" style="width: 26px; height: 20px;">
+                                                    <path
+                                                        class=""
+                                                        transform="translate(13, 10)"
+                                                        d="M-3.082207001484488,-3.082207001484488h6.164414002968976v6.164414002968976h-6.164414002968976Z"
+                                                        style="stroke: rgb(44, 160, 44); fill: rgb(44, 160, 44); stroke-width: 2px;"
+                                                    ></path>
+                                                </svg>
+                                                <div class="l1 lheight1a">Liquid bulk</div>
+                                            </div>
+                                            <div class="row pl0 l1 lheight1a c1 t-mono pre t-top"></div>
+                                        </div>
+                                        <div class="col y-top" style="min-width: fit-content; min-height: 42px; cursor: default; opacity: 1;">
+                                            <div class="row hvr-b1a rad2 b0 ptr" style="padding-top: 1px; padding-right: 6px; padding-bottom: 1px;">
+                                                <svg class="rigid" viewBox="0 0 26 20" style="width: 26px; height: 20px;">
+                                                    <path
+                                                        class=""
+                                                        transform="translate(13, 10)"
+                                                        d="M-3.082207001484488,-3.082207001484488h6.164414002968976v6.164414002968976h-6.164414002968976Z"
+                                                        style="stroke: rgb(61, 87, 167); fill: rgb(61, 87, 167); stroke-width: 2px;"
+                                                    ></path>
+                                                </svg>
+                                                <div class="l1 lheight1a">Cargo</div>
+                                            </div>
+                                            <div class="row pl0 l1 lheight1a c1 t-mono pre t-top"></div>
+                                        </div>
+                                        <div class="col y-top" style="min-width: fit-content; min-height: 42px; cursor: default; opacity: 1;">
+                                            <div class="row hvr-b1a rad2 b0 ptr" style="padding-top: 1px; padding-right: 6px; padding-bottom: 1px;">
+                                                <svg class="rigid" viewBox="0 0 26 20" style="width: 26px; height: 20px;">
+                                                    <path
+                                                        class=""
+                                                        transform="translate(13, 10)"
+                                                        d="M-3.082207001484488,-3.082207001484488h6.164414002968976v6.164414002968976h-6.164414002968976Z"
+                                                        style="stroke: rgb(214, 39, 40); fill: rgb(214, 39, 40); stroke-width: 2px;"
+                                                    ></path>
+                                                </svg>
+                                                <div class="l1 lheight1a">Others</div>
+                                            </div>
+                                            <div class="row pl0 l1 lheight1a c1 t-mono pre t-top"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col widthf"></div>
+        </div>
+        <div class="row"></div>
+    </div>
+</div>
+
+                    </div>`;
+                        
+                legendControl.updateHTML(htmlContent); 
+               
+
+                    
+                               
+        let vesselmap = cy.map;
+        let porturl = cy.port_url;
+        let portinvessel = cy.port_in_vessels_graph;
+        let Port_arrivals = cy.Port_arrivals_and_departures_graph;
+        let trade = cy.container_trade_graph;
+
+             Promise.all([
+            fetch(vesselmap).then(res => res.json()),
+            fetch(porturl).then(res => res.json()),
+            fetch(portinvessel).then(res => res.json()),
+            fetch(Port_arrivals).then(res => res.json()),
+            fetch(trade).then(res => res.json())
+        ]).then(([vesselmapData, porturlData, portinvesselData, Port_arrivalsData, tradeData]) => {
+            console.log(vesselmapData, porturlData, portinvesselData, Port_arrivalsData, tradeData);
+
+              console.error("An error occurred while fetching data: ", error);
+    });
+  fetch(vesselmap)
+    .then(response => response.json())
+    .then(data => {
+        const vesselData = data.response.docs;
+        vesselData.forEach((vessel) => {
+            const lat = parseFloat(vessel.coord.split(',')[0]);
+            const lon = parseFloat(vessel.coord.split(',')[1]);
+            
+            console.log(`Lat: ${lat}, Lon: ${lon}`);
+            console.log(vessel.heading); // log the vessel heading
+            const markerRotation = vessel.heading
+            // Rest of your code goes here...
+            let iconUrl;
+            switch(vessel.ship_type) {
+                case 'Cargo':
+                    iconUrl = 'https://www.econdb.com/static/assets/pics/mapbox/nav-arrow.png';
+                    break;
+                case 'Passenger':
+                    iconUrl = 'https://www.econdb.com/static/assets/pics/mapbox/nav-arrow-2.png';
+                    break;
+                case 'Tanker':
+                    iconUrl = 'https://www.econdb.com/static/assets/pics/mapbox/nav-arrow-3.png';
+                    break;
+                default:
+                    iconUrl = 'https://www.econdb.com/static/assets/pics/mapbox/nav-arrow-4.png';
+            }
+            // Create HTML element for the vessel marker
+            const vesselEl = document.createElement('div');
+            vesselEl.className = 'marker';
+            vesselEl.style.backgroundImage = `url(${iconUrl})`;
+
+            // Change the icon on mouseenter
+            vesselEl.addEventListener('mouseenter', () => vesselEl.style.backgroundImage = 'url(icons/nav-arrow-hovered.png)');
+            // Change the icon back on mouseleave
+            vesselEl.addEventListener('mouseleave', () => vesselEl.style.backgroundImage = `url(${iconUrl})`);
+
+            // Create a marker using the HTML element and add it to the map
+            var vesselMarker = new mapboxgl.Marker(vesselEl, {rotationAlignment: 'map', pitchAlignment: 'map'})
+                
+                .setLngLat([lon, lat])
+                .addTo(map);
+            
+            var rotation = parseFloat(vessel.heading)
+            vesselMarker.setRotation(rotation);
+
+            // Create a popup for the marker and add it to the marker
+            var vesselPopup = new mapboxgl.Popup({ offset: 25 })
+                .setHTML(`
+                <p>${vessel.name}</p>
+                <p>${vessel.last_seen}</p>
+                <p>${vessel.ship_type}</p>`);
+            vesselMarker.setPopup(vesselPopup);
+            // Show the popup on mouseenter
+            vesselEl.addEventListener('mouseenter', () => vesselMarker.togglePopup());
+            // Hide the popup on mouseleave
+            vesselEl.addEventListener('mouseleave', () => vesselMarker.togglePopup());
+        });
+      
+      
+      function generatePopupHtml(station) {
+    return `
+      <div id="coverageMapPopup" class="row" style="display: block;">
+        <h1><span class="badge" id="coverageMapStationID">${station.id}</span>
+          <span id="coverageMapStationName">${station.name}</span></h1>
+        <button class="button" id="coverageMapStationButton" onclick="loadStationData(${station.id}); loadShipData(${station.id})">Status</button>
+        <div id="coverageMapPopupClose">x</div>
+      </div>
+    `;
+}              
+            })
+                });
+           
+        })   
+    map.addControl(new mapboxgl.NavigationControl());
+    map.addControl(new mapboxgl.ScaleControl());
+
+                    });
+         });
+
+    
+</script>
+    
+    
+    
+<script>
+   // Flag to keep track of the container's current size
+    let isSmall = false;
+
+    // Listen for a click event on the button
+    $('#resizeButton').click(function() {
+        if (isSmall) {
+            // If the container is currently small, make it large
+            $('#mapContainer').removeClass('col-lg-6').addClass('col-lg-12');
+            isSmall = false;
+        } else {
+            // If the container is currently large, make it small
+            $('#mapContainer').removeClass('col-lg-12').addClass('col-lg-6');
+            isSmall = true;
+        }
+    });
+    
+</script>
+
+  
+
+
+
+</body>
+</html>

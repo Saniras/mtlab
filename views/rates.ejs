@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>운임</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css"/>
+     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap5.min.css"/>
+    <link rel="stylesheet" href="/feather/feather.css" />
+    <link rel="stylesheet" href="/mdi/css/materialdesignicons.min.css"/>
+    <link rel="stylesheet" href="/ti-icons/css/themify-icons.css"/>
+    <link rel="stylesheet"  src="/typicons/typicons.css" />
+    <link rel="stylesheet"  href="/simple-line-icons/css/simple-line-icons.css"/>
+    <link rel="stylesheet"  href="/css/vendor.bundle.base.css" />
+    <link rel="stylesheet"  href="/css/style.css" />
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+    <script src=""></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js"></script>
+    <script src=""></script>
+</head>
+<body>
+    <div class="container-scroller">
+    <%- include('./partials/navbar') %>
+        <class class="container-fluid page-body-wrapper">
+   <%- include('./partials/setting-panel') %>
+  
+        <div class = "container">
+          <div class="col-12">
+                  <h4 class="card-title">Rate List</h4>
+                <hr>
+              <div class="table-responsive">
+                  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                     <div class="table-responsive">
+                    <table id="rates" class="table table-striped table-xs">
+                  <thead class="bg-light">
+                      <tr class="table-info">
+                        <th scope="col"></th>
+                        <th scope="col">Liner</th>
+                        <th scope="col">Mode</th>
+                        <th scope="col">POL1</th>
+                        <th scope="col">POD1</th>
+                        <th scope="col">POL2</th>
+                        <th scope="col">POD2</th>
+                        <th scope="col">국가</th>
+                        <th scope="col">Unit</th>
+                        <th scope="col">OFT</th>
+                        <th scope="col">LSS</th>
+                        <th scope="col">D_Port</th>
+                        <th scope="col">Rail</th>
+                        <th scope="col">Convoy</th>
+                        <th scope="col">D_THC</th>
+                        <th scope="col">DPB</th>
+                        <th scope="col">DPS</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Remark</th>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% for(let i = 0; i < posts.length; i++) { %>
+                      <tr class="table-default">
+                        <th scope="row"><%= i+1 %></th>
+                        <td><%= posts[i].liner %></td>
+                        <td><span class="badge badge-success rounded-pill d-inline"><%= posts[i].mode %></span></td>
+                        <td><%= posts[i].pol %></td>
+                        <td><%= posts[i].pod %></td>
+                        <td><%= posts[i].loading %></td>
+                        <td><%= posts[i].discharge %></td>
+                        <td><%= posts[i].country %></td>
+                        <td><%= posts[i].unit %></td>
+                        <td><%= posts[i].oft %></td>
+                        <td><%= posts[i].lss %></td>
+                        <td><%= posts[i].d_port %></td>
+                        <td><%= posts[i].rail %></td>
+                        <td><%= posts[i].convoy %></td>
+                        <td><%= posts[i].d_thc %></td>
+                        <td><%= posts[i].dpb %></td>
+                        <td><%= posts[i].dps %></td>
+                        <td><%= posts[i].ttl %></td>
+                        <td><%= posts[i].remark %></td>
+                          
+                        <td style="width: 12px;">
+<button onclick="getData('<%= i%>')"  type="button" id="<%=i %>" name="<%=posts[i]._id %>" class="btn btn-info btn-sm" data-toggle="modal" data-target="#exampleModal">
+                            <i class="fas fa-edit"></i>
+                          </button>
+                        </td>
+                        <td style="width: 20px;"> 
+                          <button onclick="delData('<%= i%>')" type="button" id="<%=i %>" name="<%=posts[i]._id %>" type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#exampleModal2">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <% } %>
+                    </tbody>
+                  </table>
+                         
+
+              <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                  <div class="modal-content md-10">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">운임 수정</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <form id="myForm" action="/rates" method="POST">
+
+                        <script>
+                          function getData(y) {
+                            var x = document.getElementById(y).mode;
+                            document.getElementById("rateId").value = x;
+                            const rate = document.getElementById(y).value;
+                            console.log(rate);
+                          }
+                        </script>
+                              
+                              <div class="card-body">
+                                <h4 class="card-title">운 임 등 록</h4>
+                                <form id="form" action="/rate/create" method="POST">
+                        
+                                        <div class="row text-left py-2" style="font-size: 10px;">
+                                            <div hidden class="col-12">
+                                              <input type="text" class="form-control" name="rateId" id="rateId">
+                                            </div>
+                                            <div class="col-6">
+                                                <label for="liner">Liner</label>
+                                                <input type="text" name="liner" class="form-control" id="liner" data-error="#errNm1" placeholder="Liner + Carrier">
+                                                <small id="errNm1" class="form-text text-danger">  </small>
+                                            </div>
+                                            <div class="col-6">
+                                                <label for="mode">Mode</label>
+                                                <input type="text" name="mode" class="form-control" id="mode" data-error="#errNm2" placeholder="TCR,TSR...">
+                                                <small id="errNm2" class="form-text text-danger">  </small>
+                                            </div>
+                                        </div>
+                
+                                        <div class="row text-left py-2" style="font-size: 10px;"></div>
+                    
+                                        <div class="row text-left py-2" style="font-size: 10px;">
+                                            <div class="col-4">
+                                                <label for="pol">POL</label>
+                                                <input type="text" name="pol" class="form-control" id="pol" data-error="#errNm3" placeholder="Busan">
+                                                <small id="errNm3" class="form-text text-danger">  </small>
+                                            </div>
+                                            <div class="col-4">
+                                                <label for="pod">POD</label>
+                                                <input type="text" name="pod" class="form-control" id="pod" data-error="#errNm4" placeholder="Qingdao">
+                                                <small id="errNm4" class="form-text text-danger">  </small>
+                                            </div>
+                                            <div class="col-4">
+                                                <label for="loading">L.Station</label>
+                                                <input type="text" name="loading" class="form-control" id="loading" data-error="#errNm5" placeholder="Xian">
+                                                <small id="errNm5" class="form-text text-danger">  </small>
+                                            </div>
+                                            <div class="col-4">
+                                              <label for="discharge">D.Station</label>
+                                              <input type="text" name="disscharge" class="form-control" id="discharge" data-error="#errNm6" placeholder="Almaty">
+                                              <small id="errNm6" class="form-text text-danger">  </small>
+                                          </div>
+                                          <div class="col-4">
+                                            <label for="country">Country</label>
+                                            <input type="text" name="country" class="form-control" id="country" data-error="#errNm7" placeholder="Kazhakhstan">
+                                            <small id="errNm7" class="form-text text-danger">  </small>
+                                        </div>
+                                        <div class="col-4">
+                                          <label for="dep">Department</label>
+                                          <input type="text" name="dep" class="form-control" id="dep" data-error="#errNm8" placeholder="CIS">
+                                          <small id="errNm8" class="form-text text-danger">  </small>
+                                      </div>
+                                      <div class="col-4">
+                                        <label for="unit">Unit</label>
+                                        <input type="text" name="unit" class="form-control" id="unit" data-error="#errNm9" placeholder="20, 40HC, Car, Wagon">
+                                        <small id="errNm9" class="form-text text-danger">  </small>
+                                    </div>
+                                    </div>
+                
+                                    <div class="row text-left py-10" style="font-size: 10px;"></div>
+                                        <h4 class="card-title">Rate</h4>
+                                        <div hidden class="col-12">
+                                            <input type="text" class="form-control" name="rateId" id="rateId">
+                                          </div>
+                
+                                    
+                                    <div class="row text-left py-10" style="font-size: 10px;">
+                                        <div class="col-4">
+                                        <label for="oft">OFT</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">$</div>
+                                                <input type="number" name="oft" class="form-control" data-error="#errNm10" id="oft" placeholder="Ocean Freight Cost">
+                                                </div>
+                                                <small id="errNm10" class="form-text text-danger">  </small>
+                                            </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <label for="lss">LSS</label>
+                                                <div class="input-group mb-2">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text">$</div>
+                                                    <input type="number" name="lss" class="form-control" data-error="#errNm11" id="lss" placeholder="">
+                                                </div>
+                                            </div>
+                                                <small id="errNm11" class="form-text text-danger">  </small>
+                                                </div>
+                                       
+                                            <div class="col-4">
+                                            <label for="d_port">D.Port</label>
+                                            <div class="input-group mb-2">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text">$</div>
+                                                    <input type="number" name="d_port" class="form-control" data-error="#errNm12" id="d_port" placeholder="">
+                                                    </div>
+                                                </div>
+                                                    <small id="errNm12" class="form-text text-danger">  </small>
+                                                </div>
+                                            <div class="col-4">
+                                                <label for="rail">Rail</label>
+                                                <div class="input-group mb-2">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text">$</div>
+                                                    <input type="number" name="rail" class="form-control" data-error="#errNm13" id="rail" placeholder="Rail Freight">
+                                                    </div>
+                                                    </div>
+                                                <small id="errNm13" class="form-text text-danger">  </small>
+                                            </div>
+                                        <div class="col-4">
+                                        <label for="convoy">Convoy</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">$</div>
+                                                <input type="number" name="convoy" class="form-control" data-error="#errNm14" id="convoy" placeholder="">
+                                                </div>
+                                            </div>
+                                                <small id="errNm14" class="form-text text-danger">  </small>
+                                    </div>
+                                    <div class="col-4">
+                                        <label for="d_thc">D_THC</label>
+                                        <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">$</div>
+                                            <input type="number" name="d_thc" class="form-control" data-error="#errNm15" id="d_thc" placeholder="">
+                                            </div>
+                                            </div>
+                                            <small id="errNm15" class="form-text text-danger">  </small>
+                                    </div>
+                                        <div class="col-4">
+                                        <label for="dpb">DPB</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">$</div>
+                                                <input type="number" name="dpb" class="form-control" data-error="#errNm16" id="dpb" placeholder="">
+                                                </div>
+                                            </div>
+                                                <small id="errNm16" class="form-text text-danger">  </small>
+                                    </div>
+                                    <div class="col-4">
+                                        <label for="dps">DPS</label>
+                                        <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">$</div>
+                                            <input type="number" name="dps" class="form-control" data-error="#errNm17" id="dps" placeholder="">
+                                            </div>
+                                            </div>
+                                            <small id="errNm17" class="form-text text-danger">  </small>
+                                    </div>
+                    
+                                    <div class="col-4">
+                                    <label for="ttl">Total</label>
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">$</div>
+                                            <input type="number" name="ttl" class="form-control" data-error="#errNm18" id="ttl" placeholder="">
+                                            </div>
+                                        </div>
+                                            <small id="errNm18" class="form-text text-danger">  </small>
+                                </div>
+                                    <div class="col-6">
+                                        <label for="valid">Validity</label>
+                                        <input type="date" name="valid" class="form-control" id="valid" data-error="#errNm19" placeholder="">
+                                        <small id="errNm19" class="form-text text-danger">  </small>
+                                    </div>
+                    
+                                    <div class="col-6">
+                                    <label for="remark">Remark</label>
+                                    <input type="text" name="remark" class="form-control" id="remark" data-error="#errNm20" placeholder="">
+                                          <small id="errNm20" class="form-text text-danger">  </small>
+                                      </div>                    
+                                    </div>
+                                
+                  <div class="text-left">
+                                    <button type="submit"  class="btn btn-outline-primary" style="width: 180px; font-size: 14px;">운임 등록</button>
+                                    <a class="btn btn-outline-info" href="/rate/rates" role="button" style="width: 180px; font-size: 14px;">리스트</a>
+                                </div>
+                                </form>
+                              </div>
+                          <div class="modal-footer">
+                              <a class="btn btn-outline-info" href="/rates" role="button" class="btn btn-secondary" data-dismiss="modal">리스트</a>
+                            <button type="submit" class="btn btn-primary" onclick="reload">변경목록 저장</button>
+                          </div>
+                        </form>
+                        
+                      </div>
+                    </div>
+                  </div>
+
+    
+<!-- Button trigger modal -->
+<script>
+  function delData(y) {
+    var x = document.getElementById(y).name;
+    document.getElementById("delId").value = x;
+  }
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        정말 삭제 하시겠습니까?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+        <form action="/delrate" method="POST">
+          <button type="submit" name="delId" id="delId" class="btn btn-danger">운임 삭제</button>
+        </form>
+      </div>
+    </div>
+  </div>
+              </div>
+            </div>
+</div>
+                  </div>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            </div>
+        </class>
+    </div>
+
+<script>
+$(document).ready(function() {
+    $('#rates').DataTable( {
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ]
+    } );
+} );
+</script>
+
+    
+    <script>
+      jQuery(function($) {
+        $('#myForm').validate({
+          rules: {
+              name: {
+                  required: true,
+                  minlength: 3,
+                  maxlength: 30
+              },
+              brand: {
+                  required: true,
+                  minlength: 3,
+                  maxlength: 30
+              },
+              price: {
+                  required: true,
+                  minlength: 4,
+                  maxlength: 6
+              },
+              year: {
+                  required: true,
+                  minlength: 4,
+              },
+              country: {
+                  required: true,
+                  minlength: 3,
+                  maxlength: 30
+              }
+          },
+          messages: {
+              name: {
+                  required: "Car name is required",
+                  minlength: "Please enter at least 3 characters.",
+                  maxlength: "Please enter no more than 30 characters."
+              },
+              brand: {
+                  required: "Brand name is required",
+                  minlength: "Please enter at least 3 characters.",
+                  maxlength: "Please enter no more than 30 characters."
+              },
+              price: {
+                  required: "Price is required",
+                  minlength: "Min: 10000",
+                  maxlength: "Max: 1000000"
+              },
+              year: {
+                  required: "Year is required",
+                  minlength: "min 1000"
+              },
+              country: {
+                  required: "Country is required",
+                  minlength: "Please enter at least 3 characters.",
+                  maxlength: "Please enter no more than 30 characters."
+              }
+          },
+  
+          errorPlacement: function(error, element) {
+              var placement = $(element).data('error');
+              if (placement) {
+                $(placement).append(error)
+              } else {
+                error.insertAfter(element);
+              }
+          },
+  
+      });
+      });
+      </script>
+
+
+    <%- include('./partials/footer') %>
+            
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+     integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+</body>
+</html>

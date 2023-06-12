@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>MTL Dashboard</title>
+    <!-- plugins:css -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css"/>
+    <link rel="stylesheet" href="/mdi/css/materialdesignicons.min.css"/>
+    <link rel="stylesheet" href="/ti-icons/css/themify-icons.css"/>
+    <link rel="stylesheet"  src="/typicons/typicons.css" />
+    <link rel="stylesheet"  href="/simple-line-icons/css/simple-line-icons.css"/>
+    <link rel="stylesheet"  href="/css/vendor.bundle.base.css" />
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+    <!-- Include DataTables -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet"  href="/css/track.css" />
+    <!-- endinject -->
+    <link rel="shortcut icon"  href="/images/favicon.png" />
+    <script src='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css' rel='stylesheet' />
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css' rel='stylesheet' />
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css' rel='stylesheet' />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+  </head>
+    
+    
+    
+    <body>
+    <div id="tracking-overlay"></div>
+    <div id="map" style="width: 100%; height: 674px;"></div>
+    
+    <div class="tracking-wrapper active">
+  <div class="tracking-header">
+    <div class="tracking-filter">
+      <div class="container-filter">
+        <div class="container-fluid">
+          <div class="full-width-filter-wrapper">
+            <div class="col-sm-12 tracking-filter-wrapper">
+              <div id="panel">
+
+                <div class="panel-sector code-sector search-input invalid">
+                  <input type="text" name="container" placeholder="Enter container number" autocomplete="off" minlength="6" pattern="[A-Za-z0-9]*" required="" value="">
+                  <i class="fal fa-search" aria-hidden="true"></i>
+                </div>
+
+                <div class="panel-sector panel-sector-no-border hidden">
+                  <select name="history" id="history" class="select2 select2-hidden-accessible" style="width: 100% !important;" data-select2-id="history" tabindex="-1" aria-hidden="true">
+                    <option value="" style="color: #ff5d00 !important;" selected="" disabled="" data-select2-id="5">History
+                    </option>
+                  </select>
+                    <span class="select2 select2-container select2-container--default" dir="ltr" data-select2-id="4" style="width: 100%;">
+                        <span class="selection">
+                            <span class="select2-selection select2-selection--single" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-disabled="false" aria-labelledby="select2-history-container">
+                                <span class="select2-selection__rendered" id="select2-history-container" role="textbox" aria-readonly="true" title="History">History
+                        </span>
+                            <span class="select2-selection__arrow" role="presentation">
+                                <b role="presentation"></b></span></span></span>
+                        <span class="dropdown-wrapper" aria-hidden="true"></span></span>
+                </div>
+
+              </div>
+
+              <div class="panel-sector panel-sector-no-border">
+                <div id="searchBtn" class="panel-sector-btn">Search</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-toggle">
+      <div class="toggler-panel">
+        <a class="toggler active"><i class="fal fa-container-storage" aria-hidden="true"></i>
+            <span>Tracking</span></a>
+        <a class="toggler"><i class="fad fa-map-marked-alt" aria-hidden="true"></i>
+            <span>Map</span></a>
+      </div>
+
+      <div class="toggle-view">
+        <button>
+          <i class="fas fa-arrow-up" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="add-new instruments-panel unregistered" style="padding-top: 0px;">
+    <div class="col">
+      <div class="panel-buttons-right">
+        <div class="folders-tree-actions">
+          <a class="fta-back disabled active" style="display: inline;" data-parent_folder_id="">
+              <i class="fal fa-angle-left" aria-hidden="true"></i></a>
+          <a class="fta-next" style="display: none;">
+              <i class="fal fa-angle-right" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div class="not-registered-info">
+        <div class="backdrop-not-found">
+          <p>
+
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="loader-drop" style="display: none;">
+    <div class="shadow-item-folder">
+      <div class="sif-grey-dark" style="width: 34px;"></div>
+      <div class="sif-grey-dark" style="width: 196px;"></div>
+    </div>
+    <div class="shadow-item-folder">
+      <div class="sif-grey-dark" style="width: 34px;"></div>
+      <div class="sif-grey-dark" style="width: 196px;"></div>
+    </div>
+    <div class="shadow-item-folder">
+      <div class="sif-grey-dark" style="width: 34px;"></div>
+      <div class="sif-grey-dark" style="width: 196px;"></div>
+    </div>
+    <div class="shadow-item-container">
+      <div class="sif-col-1">
+        <div class="sif-grey-dark" style="width: 128px;"></div>
+        <div class="sif-grey-light sif-tall" style="width: 156px;"></div>
+        <div class="sif-grey-dark" style="width: 76px;"></div>
+      </div>
+      <div class="sif-col-2">
+        <div class="sif-row">
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px;"></div>
+          <div class="sif-grey-light" style="width: 76px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-dark sif-thick" style="width: 100%;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px; opacity: 0;"></div>
+          <div class="sif-grey-light" style="width: 91px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="shadow-item-container">
+      <div class="sif-col-1">
+        <div class="sif-grey-dark" style="width: 128px;"></div>
+        <div class="sif-grey-light sif-tall" style="width: 156px;"></div>
+        <div class="sif-grey-dark" style="width: 76px;"></div>
+      </div>
+      <div class="sif-col-2">
+        <div class="sif-row">
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px;"></div>
+          <div class="sif-grey-light" style="width: 76px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-dark sif-thick" style="width: 100%;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px; opacity: 0;"></div>
+          <div class="sif-grey-light" style="width: 91px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="shadow-item-container">
+      <div class="sif-col-1">
+        <div class="sif-grey-dark" style="width: 128px;"></div>
+        <div class="sif-grey-light sif-tall" style="width: 156px;"></div>
+        <div class="sif-grey-dark" style="width: 76px;"></div>
+      </div>
+      <div class="sif-col-2">
+        <div class="sif-row">
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px;"></div>
+          <div class="sif-grey-light" style="width: 76px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-dark sif-thick" style="width: 100%;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px; opacity: 0;"></div>
+          <div class="sif-grey-light" style="width: 91px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="shadow-item-container">
+      <div class="sif-col-1">
+        <div class="sif-grey-dark" style="width: 128px;"></div>
+        <div class="sif-grey-light sif-tall" style="width: 156px;"></div>
+        <div class="sif-grey-dark" style="width: 76px;"></div>
+      </div>
+      <div class="sif-col-2">
+        <div class="sif-row">
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px;"></div>
+          <div class="sif-grey-light" style="width: 76px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-dark sif-thick" style="width: 100%;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px; opacity: 0;"></div>
+          <div class="sif-grey-light" style="width: 91px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="shadow-item-folder">
+      <div class="sif-grey-dark" style="width: 34px;"></div>
+      <div class="sif-grey-dark" style="width: 196px;"></div>
+    </div>
+    <div class="shadow-item-folder">
+      <div class="sif-grey-dark" style="width: 34px;"></div>
+      <div class="sif-grey-dark" style="width: 196px;"></div>
+    </div>
+    <div class="shadow-item-container">
+      <div class="sif-col-1">
+        <div class="sif-grey-dark" style="width: 128px;"></div>
+        <div class="sif-grey-light sif-tall" style="width: 156px;"></div>
+        <div class="sif-grey-dark" style="width: 76px;"></div>
+      </div>
+      <div class="sif-col-2">
+        <div class="sif-row">
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px;"></div>
+          <div class="sif-grey-light" style="width: 76px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-dark sif-thick" style="width: 100%;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px; opacity: 0;"></div>
+          <div class="sif-grey-light" style="width: 91px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="shadow-item-container">
+      <div class="sif-col-1">
+        <div class="sif-grey-dark" style="width: 128px;"></div>
+        <div class="sif-grey-light sif-tall" style="width: 156px;"></div>
+        <div class="sif-grey-dark" style="width: 76px;"></div>
+      </div>
+      <div class="sif-col-2">
+        <div class="sif-row">
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px;"></div>
+          <div class="sif-grey-light" style="width: 76px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-dark sif-thick" style="width: 100%;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px; opacity: 0;"></div>
+          <div class="sif-grey-light" style="width: 91px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="shadow-item-container">
+      <div class="sif-col-1">
+        <div class="sif-grey-dark" style="width: 128px;"></div>
+        <div class="sif-grey-light sif-tall" style="width: 156px;"></div>
+        <div class="sif-grey-dark" style="width: 76px;"></div>
+      </div>
+      <div class="sif-col-2">
+        <div class="sif-row">
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+          <div class="sif-grey-dark" style="width: 106px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px;"></div>
+          <div class="sif-grey-light" style="width: 76px;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-dark sif-thick" style="width: 100%;"></div>
+        </div>
+        <div class="sif-row">
+          <div class="sif-grey-light" style="width: 76px; opacity: 0;"></div>
+          <div class="sif-grey-light" style="width: 91px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+            </div>
+<script>
+// Configuring mapbox
+mapboxgl.accessToken = 'pk.eyJ1IjoiY2FycmllLXhpYSIsImEiOiJja3Z0NDVtMzczZWpnMm9tdG92eHgxZXo5In0.DQ9J_C1Np1kl0Slf4EVoMA';
+
+var map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
+    center: [0, 0], // starting position [lng, lat]
+    zoom: 1 // starting zoom
+});
+
+// Define the pulsing dot effect
+var size = 100;
+var pulsingDot = {
+    width: size,
+    height: size,
+    data: new Uint8Array(size * size * 4),
+  
+    onAdd: function() {
+        var canvas = document.createElement('canvas');
+        canvas.width = this.width;
+        canvas.height = this.height;
+        this.context = canvas.getContext('2d');
+    },
+  
+    render: function() {
+        var duration = 1000;
+        var t = (performance.now() % duration) / duration;
+  
+        var radius = size / 2 * 0.3;
+        var outerRadius = size / 2 * 0.7 * t + radius;
+        var context = this.context;
+  
+        // Draw outer circle
+        context.clearRect(0, 0, this.width, this.height);
+        context.beginPath();
+        context.arc(this.width / 2, this.height / 2, outerRadius, 0, Math.PI * 2);
+        context.fillStyle = 'rgba(255, 200, 200,' + (1 - t) + ')';
+        context.fill();
+  
+        // Draw inner circle
+        context.beginPath();
+        context.arc(this.width / 2, this.height / 2, radius, 0, Math.PI * 2);
+        context.fillStyle = 'rgba(255, 100, 100, 1)';
+        context.strokeStyle = 'white';
+        context.lineWidth = 2 + 4 * (1 - t);
+        context.fill();
+        context.stroke();
+  
+        // keep the map repainting
+        map.triggerRepaint();
+  
+        // return `true` to let the map know that the image was updated
+        return true;
+    }
+};
+
+map.on('load', function () {
+    map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 2 });
+
+    var marker = new mapboxgl.Marker({
+        color: "#F7455D"
+    }).setLngLat([0, 0]).addTo(map);
+
+    // Search button click event
+    document.getElementById('searchBtn').addEventListener('click', function(event) {
+        var containerNumber = document.querySelector('input[name="container"]').value;
+        getContainerLocation(containerNumber);
+    });
+
+    function getContainerLocation(containerNumber) {
+        var url = 'https://api.sinay.ai/container-tracking/api/v1/location/container?number=' + containerNumber;
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'API_KEY': '6c69b6cf-cf01-46e2-92e9-b6f8760c4ac7'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            marker.setLngLat([data.location.longitude, data.location.latitude]);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+});
+
+</script>
+
+        
+        
+    </body>
+</html>
